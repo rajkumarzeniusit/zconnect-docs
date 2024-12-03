@@ -1,0 +1,170 @@
+for email:
+*****************************************************************************************
+CREATE TABLE emails (
+    account_id iNT,
+    message_id VARCHAR(255) ,
+    session_id VARCHAR(255),
+    direction VARCHAR(10) ,
+    sender VARCHAR(255) ,
+    recipient VARCHAR(255) ,
+    cc_emails VARCHAR(255),
+    subject VARCHAR(255),
+    timestamp TIMESTAMPTZ,
+    body TEXT,
+    attachments BYTEA
+);
+*****************************************************************************************
+CREATE TABLE account_configurations (
+
+    id SERIAL PRIMARY KEY,              
+    account_type VARCHAR(50),           
+    username VARCHAR(255) NOT NULL,     
+    password VARCHAR(255),              
+    oauth2_token TEXT,                  
+    token_expiry TIMESTAMP,             
+    routing_group VARCHAR(100),         
+    pop3_server VARCHAR(255),           
+    pop3_port INT,                      
+    pop3_use_ssl BOOLEAN,               
+    imap_use_ssl BOOLEAN,               
+    smtp_use_ssl BOOLEAN,              
+    imap_server VARCHAR(255),           
+    imap_port INT,                      
+    smtp_server VARCHAR(255),          
+    smtp_port INT                      
+
+);
+ 
+INSERT INTO account_configurations (
+    account_type, 
+    username, 
+    password, 
+    oauth2_token, 
+    token_expiry, 
+    routing_group, 
+    pop3_server, 
+    pop3_port, 
+    pop3_use_ssl, 
+    imap_use_ssl, 
+    smtp_use_ssl, 
+    imap_server, 
+    imap_port, 
+    smtp_server, 
+    smtp_port
+) 
+VALUES (
+    'gmail',
+    'itzenius@gmail.com',
+    'bsuy mslo shxa mimu',
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    true,
+    true,
+    true,
+    'imap.gmail.com',
+    993,
+    'smtp.gmail.com',
+    587
+);
+
+
+*****************************************************************************************
+
+CREATE TABLE IF NOT EXISTS public.agent_interactions
+(
+    id SERIAL PRIMARY KEY,
+    agent_id text COLLATE pg_catalog."default" NOT NULL,
+    queues text[] COLLATE pg_catalog."default" NOT NULL,
+    skills text[] COLLATE pg_catalog."default" NOT NULL,
+    max_chat_concurrent_interactions integer NOT NULL,
+    max_call_concurrent_interactions integer NOT NULL,
+    max_email_concurrent_interactions integer NOT NULL
+);
+
+
+INSERT INTO public.agent_interactions (
+    id, agent_id, queues, skills, 
+    max_chat_concurrent_interactions, 
+    max_call_concurrent_interactions, 
+    max_email_concurrent_interactions
+) 
+VALUES 
+(
+    1, 
+    'ashokreddy@gmail.com', 
+    ARRAY['technicalsupportqueue@1'], 
+    ARRAY['networking_skill'], 
+    1, 
+    3, 
+    1
+),
+(
+    2, 
+    'Gopi@gamil.com', 
+    ARRAY['technicalsupportqueue@1', 'customer_servicequeue@123'], 
+    ARRAY['networking_skill', 'troubleshooting_skill'], 
+    1, 
+    3, 
+    1
+);
+
+*****************************************************************************************
+
+CREATE TABLE IF NOT EXISTS public.agent_skills
+(
+    queues text[] COLLATE pg_catalog."default" NOT NULL,
+    skills text[] COLLATE pg_catalog."default" NOT NULL
+)
+INSERT INTO public.agent_skills (queues, skills)
+VALUES 
+(
+    ARRAY['technicalsupportqueue@1'], 
+    ARRAY['networking_skill']
+),
+(
+    ARRAY['technicalsupportqueue@1', 'technicalsupportqueue@2'], 
+    ARRAY['networking_skill']
+);
+
+
+*****************************************************************************************
+for chat:
+**********
+CREATE TABLE IF NOT EXISTS public.accepted_chats (
+    id SERIAL PRIMARY KEY,
+    session_id text COLLATE pg_catalog."default" NOT NULL,
+    accepted boolean NOT NULL
+);
+*****************************************************************************************
+CREATE TABLE IF NOT EXISTS public.agents (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR(50) COLLATE pg_catalog."default" NOT NULL UNIQUE,
+    name VARCHAR(50) COLLATE pg_catalog."default" NOT NULL,
+    phone VARCHAR(15) COLLATE pg_catalog."default" NOT NULL,
+    user_input VARCHAR(500) COLLATE pg_catalog."default",
+    queues VARCHAR(50) COLLATE pg_catalog."default",
+    skills VARCHAR(50) COLLATE pg_catalog."default",
+    is_first_message BOOLEAN,
+    email VARCHAR(50) COLLATE pg_catalog."default",
+    "timestamp" TIMESTAMP WITH TIME ZONE,
+    agent_id VARCHAR(50) COLLATE pg_catalog."default"
+);
+
+*****************************************************************************************
+
+
+CREATE TABLE IF NOT EXISTS public.conversations (
+    id SERIAL PRIMARY KEY,
+    session_id TEXT COLLATE pg_catalog."default" NOT NULL,
+    username TEXT COLLATE pg_catalog."default" NOT NULL,
+    phone TEXT COLLATE pg_catalog."default" NOT NULL,
+    queues TEXT COLLATE pg_catalog."default",
+    email TEXT COLLATE pg_catalog."default",
+    agentname TEXT COLLATE pg_catalog."default",
+    agent_id TEXT COLLATE pg_catalog."default" NOT NULL,
+    messages JSONB NOT NULL
+);
+*****************************************************************************************
